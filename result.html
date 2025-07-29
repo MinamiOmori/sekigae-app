@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>席替え結果</title>
+<style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 20px;
+    background: #f9f9f9;
+    margin: 0;
+  }
+  h1 {
+    margin-bottom: 20px;
+  }
+  .seats {
+    display: grid;
+    grid-template-columns: repeat(6, 80px);
+    grid-gap: 10px;
+    justify-content: center;
+    user-select: none;
+    max-width: 100%;
+    max-height: 70vh;
+    overflow: auto;
+    margin: 0 auto;
+  }
+  .seat {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    background: #eee;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    word-break: break-word;
+    padding: 5px;
+  }
+  .seat.visible {
+    opacity: 1;
+  }
+  button {
+    margin-top: 20px;
+    padding: 8px 15px;
+    font-size: 16px;
+    border-radius: 6px;
+    background: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+
+    /* 画面右下に固定 */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+  button:hover {
+    background: #388e3c;
+  }
+</style>
+</head>
+<body>
+  <h1>席替え結果</h1>
+  <div class="seats" id="seats"></div>
+  <button onclick="downloadPDF()">PDF 保存</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+<script>
+  function getSeatData() {
+    const params = new URLSearchParams(location.search);
+    const dataStr = params.get('data');
+    if(!dataStr) return null;
+    try {
+      return JSON.parse(decodeURIComponent(dataStr));
+    } catch(e) {
+      return null;
+    }
+  }
+
+  const seatData = getSeatData();
+  const seatsDiv = document.getElementById('seats');
+
+  if(!seatData){
+    window.onload = () => {
+      alert('席割り当てデータがありません。トップページに戻ります。');
+      window.location.href = 'index.html'; // トップページのファイル名に合わせてね
+    };
+  } else {
+    for(let i=1; i<=36; i++){
+      const seat = document.createElement('div');
+      seat.className = 'seat';
+      seat.dataset.number = i;
+      seat.textContent = '';
+      seatsDiv.appendChild(seat);
+    }
+
+    let index = 1;
+    function showNext(){
+      if(index > 36) return;
+      const seat = seatsDiv.querySelector(`.seat[data-number="${index}"]`);
+      if(seat){
+        seat.textContent = seatData[index] || '';
+        seat.classList.add('visible');
+      }
+      index++;
+      setTimeout(showNext, 1000);
+    }
+    showNext();
+  }
+
+  // PDF保存
+  function downloadPDF(){
+    html2pdf()
+      .set({ margin: 10, filename: '席替え結果.pdf', html2canvas: {scale:2} })
+      .from(document.body)
+      .save();
+  }
+
+  // result.html内、データ取得後に実行
+window.history.replaceState(null, '', window.location.pathname);
+
+</script>
+</body>
+</html>
