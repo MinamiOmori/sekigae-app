@@ -61,6 +61,14 @@
 </style>
 </head>
 <body>
+  <body>
+<script>
+  var pass = prompt("パスワードを入力してください");
+  if(pass !== "fuzoku.sekigae"){
+    document.body.innerHTML = "<h2>パスワードが違います。</h2>";
+  }
+</script>
+    
 <div class="left">
   <div class="blackboard">黒板</div>
   <div class="seats" id="seats"></div>
