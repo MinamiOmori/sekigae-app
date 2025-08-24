@@ -132,10 +132,13 @@
   body { flex-direction:column !important; height:auto !important; }
   .left, .right { width:100% !important; padding:5px !important; }
   .blackboard { width:100% !important; font-size:20px !important; }
-  /* 席レイアウトはそのまま（6列×6行）、横スクロール対応 */
+  /* .leftで横スクロール許可 */
+  .left { overflow-x:auto !important; }
+  /* 座席エリアは420px固定で横スクロール */
   .seats, #modalSeats {
     grid-template-columns:repeat(6,70px) !important;
     width:420px !important;
+    min-width:420px !important;
     overflow-x:auto !important;
     margin:0 auto !important;
   }
